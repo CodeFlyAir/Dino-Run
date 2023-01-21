@@ -1,12 +1,14 @@
+import 'package:dino_run/dino.dart';
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/parallax.dart';
 import 'package:flutter/material.dart';
-import 'package:dino_run/dino.dart';
 
 const double groundHeight = 32.0;
 const int dinoScaling = 10;
+const int gravity = 900;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,8 +19,13 @@ void main() async {
   ));
 }
 
-class MyGame extends FlameGame {
+class MyGame extends FlameGame with TapDetector {
   SpriteAnimationComponent dino = SpriteAnimationComponent();
+
+  double yMax = 0.0;
+  double jumpKey = 0.0;
+  double speedY = 0.0;
+  Dino _dino = Dino();
 
   Future<Component> forestBackground() async {
     return loadParallaxComponent(
@@ -53,17 +60,42 @@ class MyGame extends FlameGame {
 
     add(await loadGround());
 
+    dino.x = dino.width;
+    dino.y = canvasSize[1] - dino.height - groundHeight + 10;
+    yMax = dino.y;
     add(dino);
-    Dino().run();
+    _dino.run();
   }
 
   @override
   void onGameResize(Vector2 canvasSize) async {
     // TODO: implement onGameResize
     super.onGameResize(canvasSize);
-    dino = await Dino().idleAnimation();
+    dino = await _dino.runAnimation();
     dino.height = dino.width = canvasSize[0] / dinoScaling;
-    dino.x = dino.width;
-    dino.y = canvasSize[1] - dino.height - groundHeight + 10;
+  }
+
+  @override
+  void onTap() async {
+    // TODO: implement onTap
+    super.onTap();
+    jumpAnimation();
+  }
+
+  void jumpAnimation() {
+    speedY = -350;
+  }
+
+  @override
+  void update(double dt) {
+    // TODO: implement update
+    super.update(dt);
+    speedY += gravity * dt;
+    dino.y += speedY * dt;
+
+    if (_dino.isOnGround(yMax, dino)) {
+      speedY = 0;
+      dino.y = yMax;
+    }
   }
 }
