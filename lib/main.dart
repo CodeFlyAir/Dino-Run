@@ -24,6 +24,8 @@ class Game extends FlameGame with TapDetector {
   double yMax = 0.0;
   double jumpKey = 0.0;
   double speedY = 0.0;
+  int score = 0;
+  late TextComponent scoreText;
 
   final Dino _dino = Dino();
   final Enemy _enemy = Enemy();
@@ -40,8 +42,13 @@ class Game extends FlameGame with TapDetector {
     dino.x = dino.width;
     dino.y = canvasSize[1] - dino.height - groundHeight + 10;
     yMax = dino.y;
+
+    scoreText = TextComponent(text: score.toString());
+    scoreText.position =
+        Vector2((canvasSize[0] / 2) - scoreText.width, screenMargin);
     add(enemy);
     add(dino);
+    add(scoreText);
   }
 
   @override
@@ -86,5 +93,8 @@ class Game extends FlameGame with TapDetector {
     if (enemy.x < -60) {
       enemy.x = canvasSize[0];
     }
+
+    score += (60 * dt).toInt();
+    scoreText.text = score.toString();
   }
 }
