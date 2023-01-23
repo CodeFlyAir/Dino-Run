@@ -1,70 +1,47 @@
+import 'package:dino_run/background.dart';
+import 'package:dino_run/constants.dart';
 import 'package:dino_run/dino.dart';
+import 'package:dino_run/enemy.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
-import 'package:flame/parallax.dart';
 import 'package:flutter/material.dart';
-
-const double groundHeight = 32.0;
-const int dinoScaling = 10;
-const int gravity = 900;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
   runApp(GameWidget(
-    game: MyGame(),
+    game: Game(),
   ));
 }
 
-class MyGame extends FlameGame with TapDetector {
+class Game extends FlameGame with TapDetector {
   SpriteAnimationComponent dino = SpriteAnimationComponent();
+  SpriteAnimationComponent enemy = SpriteAnimationComponent();
 
   double yMax = 0.0;
   double jumpKey = 0.0;
   double speedY = 0.0;
-  Dino _dino = Dino();
 
-  Future<Component> forestBackground() async {
-    return loadParallaxComponent(
-      [
-        ParallaxImageData("parallax/plx-1.png"),
-        ParallaxImageData("parallax/plx-2.png"),
-        ParallaxImageData("parallax/plx-3.png"),
-        ParallaxImageData("parallax/plx-4.png"),
-        ParallaxImageData("parallax/plx-5.png"),
-      ],
-      baseVelocity: Vector2(10, 0),
-      velocityMultiplierDelta: Vector2(1.6, 1.0),
-    );
-  }
-
-  Future<ParallaxComponent<FlameGame>> loadGround() async {
-    return await ParallaxComponent.load(
-      [
-        ParallaxImageData("parallax/plx-6Grd.png"),
-      ],
-      fill: LayerFill.none,
-      baseVelocity: Vector2(65, 0),
-      velocityMultiplierDelta: Vector2(1.6, 1.0),
-    );
-  }
+  final Dino _dino = Dino();
+  final Enemy _enemy = Enemy();
+  final Background _background = Background();
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
 
-    add(await forestBackground());
+    add(await _background.forestBackground());
 
-    add(await loadGround());
+    add(await _background.loadGround());
 
     dino.x = dino.width;
     dino.y = canvasSize[1] - dino.height - groundHeight + 10;
     yMax = dino.y;
+    add(enemy);
     add(dino);
-    _dino.run();
   }
 
   @override
@@ -73,6 +50,12 @@ class MyGame extends FlameGame with TapDetector {
     super.onGameResize(canvasSize);
     dino = await _dino.runAnimation();
     dino.height = dino.width = canvasSize[0] / dinoScaling;
+
+    enemy = await _enemy.enemyAnimation();
+    enemy.height = enemy.width = canvasSize[0] / enemyScaling;
+
+    enemy.x = enemy.width + canvasSize[0];
+    enemy.y = canvasSize[1] - enemy.height - groundHeight + 10;
   }
 
   @override
@@ -83,7 +66,7 @@ class MyGame extends FlameGame with TapDetector {
   }
 
   void jumpAnimation() {
-    speedY = -350;
+    speedY = -450;
   }
 
   @override
@@ -96,6 +79,12 @@ class MyGame extends FlameGame with TapDetector {
     if (_dino.isOnGround(yMax, dino)) {
       speedY = 0;
       dino.y = yMax;
+    }
+
+    enemy.x -= speed;
+
+    if (enemy.x < -60) {
+      enemy.x = canvasSize[0];
     }
   }
 }
