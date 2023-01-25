@@ -146,7 +146,7 @@ class DinoGame extends FlameGame with TapDetector {
   }
 
   void jumpAnimation() {
-    speedY = -470;
+    speedY = -420;
     FlameAudio.play("jump.mp3");
   }
 
