@@ -1,3 +1,4 @@
+import 'package:dino_run/constants.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/parallax.dart';
@@ -12,8 +13,8 @@ class Background extends FlameGame {
         ParallaxImageData("parallax/plx-4.png"),
         ParallaxImageData("parallax/plx-5.png"),
       ],
-      baseVelocity: Vector2(10, 0),
-      velocityMultiplierDelta: Vector2(1.6, 1.0),
+      baseVelocity: backgroundSpeed,
+      velocityMultiplierDelta: velocityMultiplierDelta,
     );
   }
 
@@ -23,8 +24,8 @@ class Background extends FlameGame {
         ParallaxImageData("parallax/plx-6Grd.png"),
       ],
       fill: LayerFill.none,
-      baseVelocity: Vector2(65, 0),
-      velocityMultiplierDelta: Vector2(1.6, 1.0),
+      baseVelocity: groundBackgroundSpeed,
+      velocityMultiplierDelta: groundVelocityMultiplierDelta,
     );
   }
 }
